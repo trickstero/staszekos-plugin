@@ -1,0 +1,17 @@
+# Never commit secrets
+.claude/settings.local.json
+*.pem
+*.key
+.env
+.env.*
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor noise
+.vscode/
+.cursor/
+*.swp
+*~

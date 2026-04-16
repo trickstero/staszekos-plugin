@@ -1,0 +1,22 @@
+{
+  "name": "StaszekOS — AA Toolkit",
+  "tagline": "Full Antunovich Associates AI environment: zoning, code, SHPO, RFI, specs, editorial, and Cowork vault sync.",
+  "category": "architecture-aec",
+  "visibility": "private",
+  "install_size_estimate": "small",
+  "requires_mcp": ["mcp-obsidian", "filesystem", "gmail", "google-calendar"],
+  "skills": [
+    "/grill-me",
+    "/zoning-research",
+    "/code-lookup",
+    "/edit-narrative",
+    "/scqa",
+    "/diagram",
+    "/flowchart",
+    "/ubiquitous-language",
+    "/workflow-builder",
+    "/auto-commit",
+    "/sync-cowork",
+    "/setup"
+  ]
+}
