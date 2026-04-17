@@ -1,23 +1,46 @@
 # StaszekOS Bootstrap Script
-# Run as Administrator on a new machine after cloning staszekos-plugin
-# Usage: .\bootstrap.ps1
+# Run on a new machine after cloning staszekos-plugin
+# Usage: powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap.ps1
 
 param(
     [string]$WorkspaceRoot = "$env:USERPROFILE\Documents\Claude\StaszekOS",
-    [string]$PluginRoot = "$WorkspaceRoot\Projects\staszekos-plugin"
+    [string]$PluginRoot    = (Split-Path $MyInvocation.MyCommand.Path -Parent | Split-Path -Parent)
 )
 
-Write-Host "`n=== StaszekOS Bootstrap ===" -ForegroundColor Cyan
-Write-Host "Workspace: $WorkspaceRoot"
-Write-Host "Plugin:    $PluginRoot`n"
+$OfficeUser = "smatuzik"
+$HomeUser   = $env:USERNAME
 
-# ─── 1. Create workspace directory structure ──────────────────────────────────
-Write-Host "1. Creating workspace directory structure..." -ForegroundColor Yellow
+Write-Host ""
+Write-Host "=== StaszekOS Bootstrap ===" -ForegroundColor Cyan
+Write-Host "Workspace : $WorkspaceRoot"
+Write-Host "Plugin    : $PluginRoot"
+Write-Host "Username  : $HomeUser"
+if ($HomeUser -ne $OfficeUser) {
+    Write-Host "NOTE: Will patch '$OfficeUser' -> '$HomeUser' in all files" -ForegroundColor Yellow
+}
+Write-Host ""
 
+# Helper
+function Patch-File($path) {
+    if ((Test-Path $path) -and ($HomeUser -ne $OfficeUser)) {
+        $txt = [System.IO.File]::ReadAllText($path)
+        if ($txt -match [regex]::Escape($OfficeUser)) {
+            $txt = $txt -replace [regex]::Escape($OfficeUser), $HomeUser
+            [System.IO.File]::WriteAllText($path, $txt)
+            Write-Host "  Patched  : $(Split-Path $path -Leaf)" -ForegroundColor Green
+        }
+    }
+}
+
+# -------------------------------------------------------------------
+# 1. Directory structure
+# -------------------------------------------------------------------
+Write-Host "1. Creating directory structure..." -ForegroundColor Yellow
 $dirs = @(
     "$WorkspaceRoot\.claude\commands",
     "$WorkspaceRoot\.claude\hooks",
     "$WorkspaceRoot\Projects",
+    "$WorkspaceRoot\Scheduled",
     "$WorkspaceRoot\Cowork\Zoning-Analysis\_inputs",
     "$WorkspaceRoot\Cowork\Zoning-Analysis\_outputs",
     "$WorkspaceRoot\Cowork\Code-Research\_inputs",
@@ -27,278 +50,225 @@ $dirs = @(
     "$WorkspaceRoot\Cowork\RFI-Drafting\_inputs",
     "$WorkspaceRoot\Cowork\RFI-Drafting\_outputs",
     "$WorkspaceRoot\Cowork\SPEC-Writing\_inputs",
-    "$WorkspaceRoot\Cowork\SPEC-Writing\_outputs",
-    "$WorkspaceRoot\Scheduled"
+    "$WorkspaceRoot\Cowork\SPEC-Writing\_outputs"
 )
-
-foreach ($dir in $dirs) {
-    New-Item -ItemType Directory -Force -Path $dir | Out-Null
-    Write-Host "  ✓ $dir" -ForegroundColor Green
+foreach ($d in $dirs) {
+    New-Item -ItemType Directory -Force -Path $d | Out-Null
 }
+Write-Host "  Done" -ForegroundColor Green
 
-# ─── 2. Copy slash commands to .claude/commands/ ────────────────────────────
-Write-Host "`n2. Installing slash commands..." -ForegroundColor Yellow
-
+# -------------------------------------------------------------------
+# 2. Slash commands
+# -------------------------------------------------------------------
+Write-Host "2. Installing slash commands..." -ForegroundColor Yellow
 $cmdSrc = "$PluginRoot\commands"
 $cmdDst = "$WorkspaceRoot\.claude\commands"
-
 if (Test-Path $cmdSrc) {
     Copy-Item "$cmdSrc\*" -Destination $cmdDst -Force
-    $count = (Get-ChildItem $cmdDst -Filter "*.md").Count
-    Write-Host "  ✓ $count commands installed to $cmdDst" -ForegroundColor Green
+    $n = (Get-ChildItem $cmdDst -Filter "*.md").Count
+    Write-Host "  $n commands installed" -ForegroundColor Green
 } else {
-    Write-Host "  ✗ Commands source not found: $cmdSrc" -ForegroundColor Red
+    Write-Host "  MISSING: $cmdSrc" -ForegroundColor Red
 }
 
-# ─── 3. Copy Cowork vault structure ─────────────────────────────────────────
-Write-Host "`n3. Installing Cowork vault structure..." -ForegroundColor Yellow
-
-$coworkSrc = "$PluginRoot\Cowork"
-$coworkDst = "$WorkspaceRoot\Cowork"
-
-if (Test-Path $coworkSrc) {
-    Copy-Item "$coworkSrc\*" -Destination $coworkDst -Recurse -Force
-    Write-Host "  ✓ Cowork vault structure installed" -ForegroundColor Green
+# -------------------------------------------------------------------
+# 3. CLAUDE.md
+# -------------------------------------------------------------------
+Write-Host "3. Installing CLAUDE.md..." -ForegroundColor Yellow
+$src = "$PluginRoot\CLAUDE.md"
+if (Test-Path $src) {
+    Copy-Item $src -Destination "$WorkspaceRoot\CLAUDE.md" -Force
+    Patch-File "$WorkspaceRoot\CLAUDE.md"
+    Write-Host "  Done" -ForegroundColor Green
 } else {
-    Write-Host "  ✗ Cowork source not found: $coworkSrc" -ForegroundColor Red
+    Write-Host "  MISSING: $src" -ForegroundColor Red
 }
 
-# ─── 4. Copy CLAUDE.md to workspace root ────────────────────────────────────
-Write-Host "`n4. Installing CLAUDE.md..." -ForegroundColor Yellow
-
-$claudeMdSrc = "$PluginRoot\CLAUDE.md"
-$claudeMdDst = "$WorkspaceRoot\CLAUDE.md"
-
-if (Test-Path $claudeMdSrc) {
-    Copy-Item $claudeMdSrc -Destination $claudeMdDst -Force
-    Write-Host "  ✓ CLAUDE.md installed" -ForegroundColor Green
+# -------------------------------------------------------------------
+# 4. Cowork vault (Obsidian memory structure)
+# -------------------------------------------------------------------
+Write-Host "4. Installing Cowork vault..." -ForegroundColor Yellow
+$src = "$PluginRoot\Cowork"
+if (Test-Path $src) {
+    Copy-Item "$src\*" -Destination "$WorkspaceRoot\Cowork" -Recurse -Force
+    Write-Host "  Done" -ForegroundColor Green
 } else {
-    Write-Host "  ✗ CLAUDE.md source not found" -ForegroundColor Red
+    Write-Host "  MISSING: $src" -ForegroundColor Red
 }
 
-# ─── 5. Bootstrap memory files ───────────────────────────────────────────────
-Write-Host "`n5. Bootstrapping memory files..." -ForegroundColor Yellow
-
-$projKey = "C--Users-$env:USERNAME-Documents-Claude-StaszekOS"
-$memDst = "$env:USERPROFILE\.claude\projects\$projKey\memory"
-$memSrc = "$PluginRoot\memory"
-
+# -------------------------------------------------------------------
+# 5. Memory files
+# -------------------------------------------------------------------
+Write-Host "5. Installing memory files..." -ForegroundColor Yellow
+$projKey = "C--Users-$HomeUser-Documents-Claude-StaszekOS"
+$memDst  = "$env:USERPROFILE\.claude\projects\$projKey\memory"
+$memSrc  = "$PluginRoot\memory"
 New-Item -ItemType Directory -Force -Path $memDst | Out-Null
-
 if (Test-Path $memSrc) {
     Copy-Item "$memSrc\*" -Destination $memDst -Force
-    $count = (Get-ChildItem $memDst -Filter "*.md").Count
-    Write-Host "  ✓ $count memory files installed to $memDst" -ForegroundColor Green
+    $n = (Get-ChildItem $memDst -Filter "*.md").Count
+    Write-Host "  $n files installed to $memDst" -ForegroundColor Green
 } else {
-    Write-Host "  ✗ Memory source not found: $memSrc" -ForegroundColor Red
+    Write-Host "  MISSING: $memSrc" -ForegroundColor Red
 }
 
-# ─── 6. Create settings.local.json template (if missing) ────────────────────
-Write-Host "`n6. Checking settings.local.json..." -ForegroundColor Yellow
-
-$settingsPath = "$WorkspaceRoot\.claude\settings.local.json"
-
-if (-not (Test-Path $settingsPath)) {
-    $template = @'
-{
+# -------------------------------------------------------------------
+# 6. settings.local.json template
+# -------------------------------------------------------------------
+Write-Host "6. settings.local.json..." -ForegroundColor Yellow
+$settingsLocal = "$WorkspaceRoot\.claude\settings.local.json"
+if (-not (Test-Path $settingsLocal)) {
+    Set-Content -Path $settingsLocal -Value '{
   "env": {
     "GITHUB_TOKEN": "ghp_YOUR_TOKEN_HERE"
   }
-}
-'@
-    Set-Content -Path $settingsPath -Value $template
-    Write-Host "  ✓ settings.local.json template created" -ForegroundColor Green
-    Write-Host "  ⚠ ACTION REQUIRED: Open $settingsPath and replace ghp_YOUR_TOKEN_HERE with your GitHub token" -ForegroundColor Yellow
+}'
+    Write-Host "  Created -- replace ghp_YOUR_TOKEN_HERE with your token" -ForegroundColor Yellow
 } else {
-    Write-Host "  ✓ settings.local.json already exists (not overwritten)" -ForegroundColor Green
+    Write-Host "  Already exists (not overwritten)" -ForegroundColor Green
 }
 
-# ─── 7. Set NODE_EXTRA_CA_CERTS for FortiGate SSL ───────────────────────────
-Write-Host "`n7. Checking SSL certificate configuration..." -ForegroundColor Yellow
-
+# -------------------------------------------------------------------
+# 7. SSL cert (office network -- skip at home if cert not present)
+# -------------------------------------------------------------------
+Write-Host "7. SSL certificate check..." -ForegroundColor Yellow
 $certPath = "$env:USERPROFILE\Documents\Claude\antunovich-ca.pem"
-$currentCert = [System.Environment]::GetEnvironmentVariable("NODE_EXTRA_CA_CERTS", "User")
-
-if (-not $currentCert) {
-    if (Test-Path $certPath) {
-        [System.Environment]::SetEnvironmentVariable("NODE_EXTRA_CA_CERTS", $certPath, "User")
-        Write-Host "  ✓ NODE_EXTRA_CA_CERTS set to $certPath" -ForegroundColor Green
-        Write-Host "  ⚠ Restart your terminal for this to take effect" -ForegroundColor Yellow
-    } else {
-        Write-Host "  ✗ CA cert not found at $certPath" -ForegroundColor Red
-        Write-Host "    ACTION REQUIRED: Download the FortiGate CA cert from IT and place at:" -ForegroundColor Yellow
-        Write-Host "    $certPath" -ForegroundColor Yellow
-        Write-Host "    Then run:" -ForegroundColor Yellow
-        Write-Host "    [System.Environment]::SetEnvironmentVariable('NODE_EXTRA_CA_CERTS', '$certPath', 'User')" -ForegroundColor White
-    }
+if (Test-Path $certPath) {
+    [System.Environment]::SetEnvironmentVariable("NODE_EXTRA_CA_CERTS", $certPath, "User")
+    Write-Host "  NODE_EXTRA_CA_CERTS set" -ForegroundColor Green
 } else {
-    Write-Host "  ✓ NODE_EXTRA_CA_CERTS already set to: $currentCert" -ForegroundColor Green
+    Write-Host "  No cert found -- skipping (OK on home network)" -ForegroundColor Yellow
 }
 
-# ─── 8. Check Git installation ───────────────────────────────────────────────
-Write-Host "`n8. Checking Git..." -ForegroundColor Yellow
-
+# -------------------------------------------------------------------
+# 8. Git check
+# -------------------------------------------------------------------
+Write-Host "8. Git check..." -ForegroundColor Yellow
 try {
-    $gitVersion = git --version 2>&1
-    Write-Host "  ✓ $gitVersion" -ForegroundColor Green
+    $v = git --version 2>&1
+    Write-Host "  $v" -ForegroundColor Green
 } catch {
-    Write-Host "  ✗ Git not found. Install from https://git-scm.com/" -ForegroundColor Red
+    Write-Host "  Git not found -- install from https://git-scm.com/" -ForegroundColor Red
 }
 
-# ─── 9. Patch hardcoded username (office: smatuzik → this machine) ──────────
-Write-Host "`n9. Patching username in all installed files..." -ForegroundColor Yellow
-
-$officeUser = "smatuzik"
-$homeUser   = $env:USERNAME
-
-if ($homeUser -ne $officeUser) {
-    $filesToPatch = @(
-        "$WorkspaceRoot\Scheduled\wiki-mcp.py",
-        "$WorkspaceRoot\Scheduled\wiki-mcp-http.py",
-        "$WorkspaceRoot\Scheduled\sync-cowork.py",
-        "$WorkspaceRoot\.mcp.json",
-        "$WorkspaceRoot\.claude\settings.json",
-        "$WorkspaceRoot\CLAUDE.md"
-    )
-    foreach ($f in $filesToPatch) {
-        if (Test-Path $f) {
-            $content = Get-Content $f -Raw
-            if ($content -match [regex]::Escape($officeUser)) {
-                $content = $content -replace [regex]::Escape($officeUser), $homeUser
-                Set-Content -Path $f -Value $content -NoNewline
-                Write-Host "  ✓ Patched: $(Split-Path $f -Leaf)  ($officeUser -> $homeUser)" -ForegroundColor Green
-            }
-        }
-    }
-    # Also patch Cowork project CLAUDE files
-    $coworkProjectsRoot = "$env:USERPROFILE\Documents\Claude\Projects"
-    Get-ChildItem $coworkProjectsRoot -Recurse -Filter "*.md" | ForEach-Object {
-        $content = Get-Content $_.FullName -Raw
-        if ($content -and $content -match [regex]::Escape($officeUser)) {
-            $content = $content -replace [regex]::Escape($officeUser), $homeUser
-            Set-Content -Path $_.FullName -Value $content -NoNewline
-            Write-Host "  ✓ Patched: $($_.Name)" -ForegroundColor Green
-        }
-    }
-    Write-Host "  All '$officeUser' references updated to '$homeUser'" -ForegroundColor Green
-} else {
-    Write-Host "  ✓ Same username — no patching needed" -ForegroundColor Green
-}
-
-# ─── 11. Install wiki MCP scripts to Scheduled/ ─────────────────────────────
-Write-Host "`n9. Installing wiki MCP and sync scripts..." -ForegroundColor Yellow
-
-$scheduledDst = "$WorkspaceRoot\Scheduled"
-New-Item -ItemType Directory -Force -Path $scheduledDst | Out-Null
-
+# -------------------------------------------------------------------
+# 9. Wiki + sync scripts -> Scheduled/
+# -------------------------------------------------------------------
+Write-Host "9. Installing wiki MCP and sync scripts..." -ForegroundColor Yellow
 $scripts = @("wiki-mcp.py", "wiki-mcp-http.py", "sync-cowork.py")
 foreach ($s in $scripts) {
     $src = "$PluginRoot\scripts\$s"
+    $dst = "$WorkspaceRoot\Scheduled\$s"
     if (Test-Path $src) {
-        Copy-Item $src -Destination "$scheduledDst\$s" -Force
-        Write-Host "  ✓ $s -> Scheduled/" -ForegroundColor Green
-    } else {
-        Write-Host "  ✗ $s not found in plugin/scripts/" -ForegroundColor Red
-    }
-}
-
-# ─── 12. Install settings.json (Stop hook) ──────────────────────────────────
-Write-Host "`n11. Installing settings.json (Stop hook)..." -ForegroundColor Yellow
-
-$settingsJsonSrc = "$PluginRoot\config\settings.json"
-$settingsJsonDst = "$WorkspaceRoot\.claude\settings.json"
-
-if (Test-Path $settingsJsonSrc) {
-    if (-not (Test-Path $settingsJsonDst)) {
-        Copy-Item $settingsJsonSrc -Destination $settingsJsonDst -Force
-        Write-Host "  ✓ settings.json installed (Stop hook: sync-cowork.py runs on session end)" -ForegroundColor Green
-    } else {
-        Write-Host "  ✓ settings.json already exists (not overwritten — merge manually if needed)" -ForegroundColor Yellow
-    }
-} else {
-    Write-Host "  ✗ config/settings.json not found in plugin" -ForegroundColor Red
-}
-
-# ─── 11. Install .mcp.json (wiki MCP for Claude Code) ───────────────────────
-Write-Host "`n11. Installing .mcp.json (wiki MCP server)..." -ForegroundColor Yellow
-
-$mcpSrc = "$PluginRoot\config\staszekos-mcp.json"
-$mcpDst = "$WorkspaceRoot\.mcp.json"
-
-if (Test-Path $mcpSrc) {
-    if (-not (Test-Path $mcpDst)) {
-        Copy-Item $mcpSrc -Destination $mcpDst -Force
-        Write-Host "  ✓ .mcp.json installed (wiki tools available in Claude Code after restart)" -ForegroundColor Green
-    } else {
-        Write-Host "  ✓ .mcp.json already exists (not overwritten)" -ForegroundColor Yellow
-    }
-} else {
-    Write-Host "  ✗ config/staszekos-mcp.json not found in plugin" -ForegroundColor Red
-}
-
-# ─── 12. Install Cowork project CLAUDE.md files ─────────────────────────────
-Write-Host "`n12. Installing Cowork project context files..." -ForegroundColor Yellow
-
-$coworkProjectsRoot = "$env:USERPROFILE\Documents\Claude\Projects"
-
-$coworkMap = @{
-    "Cowork\Code-Research\CLAUDE_2.md"           = "$coworkProjectsRoot\CODE\CLAUDE_2.md"
-    "Cowork\Code-Research\ZONING.md"             = "$coworkProjectsRoot\CODE\ZONING.md"
-    "Cowork\Zoning-Analysis\CLAUDE.md"           = "$coworkProjectsRoot\ZONING\CLAUDE.md"
-    "Cowork\RFI-Drafting\CLAUDE.md"              = "$coworkProjectsRoot\RFI drafting\CLAUDE.md"
-    "Cowork\SPEC-Writing\CLAUDE.md"              = "$coworkProjectsRoot\SPEC writing\CLAUDE.md"
-    "Cowork\SHPO-Narrative\CLAUDE.md"            = "$coworkProjectsRoot\SHPO Treatment Narrative\CLAUDE.md"
-    "Cowork\hot.md"                              = "$coworkProjectsRoot\CODE\hot.md"
-    "Cowork\hot.md"                              = "$coworkProjectsRoot\ZONING\hot.md"
-    "Cowork\hot.md"                              = "$coworkProjectsRoot\RFI drafting\hot.md"
-    "Cowork\hot.md"                              = "$coworkProjectsRoot\SPEC writing\hot.md"
-    "Cowork\hot.md"                              = "$coworkProjectsRoot\SHPO Treatment Narrative\hot.md"
-}
-
-foreach ($rel in $coworkMap.Keys) {
-    $src = "$PluginRoot\$rel"
-    $dst = $coworkMap[$rel]
-    $dstDir = Split-Path $dst -Parent
-    if (Test-Path $src) {
-        New-Item -ItemType Directory -Force -Path $dstDir | Out-Null
         Copy-Item $src -Destination $dst -Force
-        Write-Host "  ✓ $(Split-Path $dst -Leaf) -> $(Split-Path $dstDir -Leaf)/" -ForegroundColor Green
+        Patch-File $dst
+        Write-Host "  $s -> Scheduled/" -ForegroundColor Green
     } else {
-        Write-Host "  ✗ Source not found: $src" -ForegroundColor Red
+        Write-Host "  MISSING: $s" -ForegroundColor Red
     }
 }
 
-# ─── 13. Install Python dependencies for wiki MCP ───────────────────────────
-Write-Host "`n13. Installing Python dependencies..." -ForegroundColor Yellow
-
-$pipPkgs = @("mcp", "starlette", "uvicorn", "anthropic")
-foreach ($pkg in $pipPkgs) {
-    Write-Host "  Installing $pkg..." -ForegroundColor Gray
-    python -m pip install $pkg --break-system-packages --quiet 2>&1 | Out-Null
-    Write-Host "  ✓ $pkg" -ForegroundColor Green
+# -------------------------------------------------------------------
+# 10. settings.json (Stop hook)
+# -------------------------------------------------------------------
+Write-Host "10. Installing settings.json (Stop hook)..." -ForegroundColor Yellow
+$src = "$PluginRoot\config\settings.json"
+$dst = "$WorkspaceRoot\.claude\settings.json"
+if (Test-Path $src) {
+    if (-not (Test-Path $dst)) {
+        Copy-Item $src -Destination $dst -Force
+        Patch-File $dst
+        Write-Host "  Installed (sync fires automatically on session end)" -ForegroundColor Green
+    } else {
+        Write-Host "  Already exists (not overwritten)" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "  MISSING: $src" -ForegroundColor Red
 }
 
-# ─── Summary ─────────────────────────────────────────────────────────────────
-Write-Host "`n=== Bootstrap Complete ===" -ForegroundColor Cyan
+# -------------------------------------------------------------------
+# 11. .mcp.json (wiki MCP for Claude Code)
+# -------------------------------------------------------------------
+Write-Host "11. Installing .mcp.json..." -ForegroundColor Yellow
+$src = "$PluginRoot\config\staszekos-mcp.json"
+$dst = "$WorkspaceRoot\.mcp.json"
+if (Test-Path $src) {
+    if (-not (Test-Path $dst)) {
+        Copy-Item $src -Destination $dst -Force
+        Patch-File $dst
+        Write-Host "  Installed (wiki tools active after Claude Code restart)" -ForegroundColor Green
+    } else {
+        Write-Host "  Already exists (not overwritten)" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "  MISSING: $src" -ForegroundColor Red
+}
+
+# -------------------------------------------------------------------
+# 12. Cowork project CLAUDE.md files -> Documents\Claude\Projects\
+# -------------------------------------------------------------------
+Write-Host "12. Installing Cowork project context files..." -ForegroundColor Yellow
+$projectsRoot = "$env:USERPROFILE\Documents\Claude\Projects"
+
+$coworkFiles = @(
+    @{ Src = "Cowork\Code-Research\CLAUDE_2.md";       Dst = "$projectsRoot\CODE\CLAUDE_2.md" },
+    @{ Src = "Cowork\Code-Research\ZONING.md";         Dst = "$projectsRoot\CODE\ZONING.md" },
+    @{ Src = "Cowork\Zoning-Analysis\CLAUDE.md";       Dst = "$projectsRoot\ZONING\CLAUDE.md" },
+    @{ Src = "Cowork\RFI-Drafting\CLAUDE.md";          Dst = "$projectsRoot\RFI drafting\CLAUDE.md" },
+    @{ Src = "Cowork\SPEC-Writing\CLAUDE.md";          Dst = "$projectsRoot\SPEC writing\CLAUDE.md" },
+    @{ Src = "Cowork\SHPO-Narrative\CLAUDE.md";        Dst = "$projectsRoot\SHPO Treatment Narrative\CLAUDE.md" },
+    @{ Src = "Cowork\hot.md";                          Dst = "$projectsRoot\CODE\hot.md" },
+    @{ Src = "Cowork\hot.md";                          Dst = "$projectsRoot\ZONING\hot.md" },
+    @{ Src = "Cowork\hot.md";                          Dst = "$projectsRoot\RFI drafting\hot.md" },
+    @{ Src = "Cowork\hot.md";                          Dst = "$projectsRoot\SPEC writing\hot.md" },
+    @{ Src = "Cowork\hot.md";                          Dst = "$projectsRoot\SHPO Treatment Narrative\hot.md" }
+)
+
+foreach ($f in $coworkFiles) {
+    $src = "$PluginRoot\$($f.Src)"
+    $dst = $f.Dst
+    if (Test-Path $src) {
+        New-Item -ItemType Directory -Force -Path (Split-Path $dst -Parent) | Out-Null
+        Copy-Item $src -Destination $dst -Force
+        Patch-File $dst
+        Write-Host "  $(Split-Path $dst -Leaf) -> $(Split-Path (Split-Path $dst -Parent) -Leaf)\" -ForegroundColor Green
+    } else {
+        Write-Host "  MISSING: $($f.Src)" -ForegroundColor Red
+    }
+}
+
+# -------------------------------------------------------------------
+# 13. Python dependencies
+# -------------------------------------------------------------------
+Write-Host "13. Installing Python dependencies..." -ForegroundColor Yellow
+$pkgs = @("mcp", "starlette", "uvicorn", "anthropic")
+foreach ($p in $pkgs) {
+    python -m pip install $p --break-system-packages -q 2>&1 | Out-Null
+    Write-Host "  $p -- OK" -ForegroundColor Green
+}
+
+# -------------------------------------------------------------------
+# Summary
+# -------------------------------------------------------------------
 Write-Host ""
-Write-Host "What was installed:" -ForegroundColor White
-Write-Host "  ✓ Slash commands  -> .claude/commands/" -ForegroundColor Green
-Write-Host "  ✓ Cowork vault    -> Cowork/ (Obsidian)" -ForegroundColor Green
-Write-Host "  ✓ Cowork contexts -> Documents/Claude/Projects/ (claude.ai)" -ForegroundColor Green
-Write-Host "  ✓ Wiki MCP server -> Scheduled/wiki-mcp.py" -ForegroundColor Green
-Write-Host "  ✓ Sync pipeline   -> Scheduled/sync-cowork.py" -ForegroundColor Green
-Write-Host "  ✓ Stop hook       -> .claude/settings.json" -ForegroundColor Green
-Write-Host "  ✓ MCP registration-> .mcp.json" -ForegroundColor Green
-Write-Host "  ✓ Knowledge base  -> hot.md in all Cowork projects" -ForegroundColor Green
+Write-Host "=== Bootstrap Complete ===" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Required manual steps:" -ForegroundColor Yellow
-Write-Host "  1. Add GitHub token to: $settingsPath" -ForegroundColor White
-Write-Host "  2. Place FortiGate CA cert at: $certPath" -ForegroundColor White
-Write-Host "  3. Clone wiki repo:  git clone https://github.com/trickstero/claude-obsidian.git" -ForegroundColor White
-Write-Host "     into: $WorkspaceRoot\claude-obsidian" -ForegroundColor White
-Write-Host "  4. Open Obsidian -> open vault at $WorkspaceRoot" -ForegroundColor White
-Write-Host "  5. Install Obsidian plugin: Local REST API (community plugins)" -ForegroundColor White
-Write-Host "  6. Restart Claude Code -> wiki tools appear automatically" -ForegroundColor White
-Write-Host "  7. In claude.ai Cowork projects -> verify CLAUDE_2.md and CLAUDE.md loaded" -ForegroundColor White
+Write-Host "Installed:" -ForegroundColor White
+Write-Host "  Slash commands  -> .claude\commands\"
+Write-Host "  CLAUDE.md       -> StaszekOS root"
+Write-Host "  Wiki MCP server -> Scheduled\wiki-mcp.py"
+Write-Host "  Sync pipeline   -> Scheduled\sync-cowork.py"
+Write-Host "  Stop hook       -> .claude\settings.json"
+Write-Host "  MCP config      -> .mcp.json"
+Write-Host "  Cowork contexts -> Documents\Claude\Projects\[each project]\"
+Write-Host "  Wiki snapshot   -> hot.md in all 5 Cowork projects"
 Write-Host ""
-Write-Host "For full setup guide see: $PluginRoot\README.md" -ForegroundColor Cyan
+Write-Host "Next steps:" -ForegroundColor Yellow
+Write-Host "  1. Edit .claude\settings.local.json -- add your GitHub token"
+Write-Host "  2. Clone the wiki:"
+Write-Host "     cd $WorkspaceRoot"
+Write-Host "     git clone https://github.com/trickstero/claude-obsidian.git claude-obsidian"
+Write-Host "  3. Open Claude Code -> File -> Open Folder -> $WorkspaceRoot"
+Write-Host "  4. In claude.ai Cowork projects: add the CLAUDE.md files from Documents\Claude\Projects\"
+Write-Host ""
+Write-Host "For help see: $PluginRoot\SETUP.md" -ForegroundColor Cyan
