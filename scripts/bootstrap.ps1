@@ -145,7 +145,47 @@ try {
     Write-Host "  ✗ Git not found. Install from https://git-scm.com/" -ForegroundColor Red
 }
 
-# ─── 9. Install wiki MCP scripts to Scheduled/ ──────────────────────────────
+# ─── 9. Patch hardcoded username (office: smatuzik → this machine) ──────────
+Write-Host "`n9. Patching username in all installed files..." -ForegroundColor Yellow
+
+$officeUser = "smatuzik"
+$homeUser   = $env:USERNAME
+
+if ($homeUser -ne $officeUser) {
+    $filesToPatch = @(
+        "$WorkspaceRoot\Scheduled\wiki-mcp.py",
+        "$WorkspaceRoot\Scheduled\wiki-mcp-http.py",
+        "$WorkspaceRoot\Scheduled\sync-cowork.py",
+        "$WorkspaceRoot\.mcp.json",
+        "$WorkspaceRoot\.claude\settings.json",
+        "$WorkspaceRoot\CLAUDE.md"
+    )
+    foreach ($f in $filesToPatch) {
+        if (Test-Path $f) {
+            $content = Get-Content $f -Raw
+            if ($content -match [regex]::Escape($officeUser)) {
+                $content = $content -replace [regex]::Escape($officeUser), $homeUser
+                Set-Content -Path $f -Value $content -NoNewline
+                Write-Host "  ✓ Patched: $(Split-Path $f -Leaf)  ($officeUser -> $homeUser)" -ForegroundColor Green
+            }
+        }
+    }
+    # Also patch Cowork project CLAUDE files
+    $coworkProjectsRoot = "$env:USERPROFILE\Documents\Claude\Projects"
+    Get-ChildItem $coworkProjectsRoot -Recurse -Filter "*.md" | ForEach-Object {
+        $content = Get-Content $_.FullName -Raw
+        if ($content -and $content -match [regex]::Escape($officeUser)) {
+            $content = $content -replace [regex]::Escape($officeUser), $homeUser
+            Set-Content -Path $_.FullName -Value $content -NoNewline
+            Write-Host "  ✓ Patched: $($_.Name)" -ForegroundColor Green
+        }
+    }
+    Write-Host "  All '$officeUser' references updated to '$homeUser'" -ForegroundColor Green
+} else {
+    Write-Host "  ✓ Same username — no patching needed" -ForegroundColor Green
+}
+
+# ─── 11. Install wiki MCP scripts to Scheduled/ ─────────────────────────────
 Write-Host "`n9. Installing wiki MCP and sync scripts..." -ForegroundColor Yellow
 
 $scheduledDst = "$WorkspaceRoot\Scheduled"
@@ -162,8 +202,8 @@ foreach ($s in $scripts) {
     }
 }
 
-# ─── 10. Install settings.json (Stop hook) ──────────────────────────────────
-Write-Host "`n10. Installing settings.json (Stop hook)..." -ForegroundColor Yellow
+# ─── 12. Install settings.json (Stop hook) ──────────────────────────────────
+Write-Host "`n11. Installing settings.json (Stop hook)..." -ForegroundColor Yellow
 
 $settingsJsonSrc = "$PluginRoot\config\settings.json"
 $settingsJsonDst = "$WorkspaceRoot\.claude\settings.json"
