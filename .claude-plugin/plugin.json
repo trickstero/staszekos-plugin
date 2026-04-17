@@ -1,7 +1,7 @@
 {
   "name": "staszekos",
-  "version": "1.0.0",
-  "description": "Antunovich Associates AI toolkit for Staszek Matuzik. Full StaszekOS environment: zoning research, building code lookup, SHPO narratives, RFI drafting, spec writing, editorial review, visualization, and Cowork vault integration. Includes 11 custom slash commands with self-rewriting capability.",
+  "version": "1.1.0",
+  "description": "Antunovich Associates AI toolkit for Staszek Matuzik. Full StaszekOS environment: zoning research, building code lookup, SHPO narratives, RFI drafting, spec writing, editorial review, visualization, and Cowork vault integration. Includes 11 custom slash commands with self-rewriting protocols, wiki MCP server for live AA knowledge base access, and sync pipeline to keep Cowork projects updated.",
   "author": {
     "name": "Staszek Matuzik",
     "url": "https://github.com/trickstero"

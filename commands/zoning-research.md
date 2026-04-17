@@ -24,7 +24,15 @@ Collect via /grill-me if not provided:
 
 ### 3. Overlay Districts and Special Conditions
 - Search: `[city] [address] overlay district historic landmark transit`
-- Chicago triggers to check: ARO (10+ units), TSL (transit-served locations), Pedestrian Streets (P-streets), Lakefront Protection Overlay, Landmark districts
+- Chicago triggers to check:
+  - **ARO**: 10+ dwelling units → affordable housing requirement. If 20%+ affordable: ALL affordable units must be Type A accessible (MOPD crossover — coordinate with /code-lookup Step 7). Check current ARO percentage by zoning district.
+  - **TSL** (transit-served location): confirm at CTA/Metra proximity map; within TSL, parking is a MAXIMUM (not minimum). DX-12 → 0.5 spaces/unit max. Document TSL boundary confirmation.
+  - **DX districts**: confirm specific FAR (DX-5 = 5.0; DX-7 = 7.0; DX-12 = 12.0). Floor area exclusions (mechanical, parking) may apply.
+  - **P-streets** (Pedestrian Streets): ground-floor active use + façade transparency requirements. Check Chicago P-street map.
+  - **Lakefront Protection Overlay**: 600' setback minimum from shoreline; separate CDOT review.
+  - **Landmark / Chicago Landmark district**: Landmarks Commission CCL review — separate process from permit, precedes permit.
+  - **Planned Development (PD)**: if site is within existing PD boundary, any change of occupancy, program increase, or FAR addition requires DPD minor change petition (separate from, and before, building permit). Multi-building FAR bundling: when PD contains existing + new buildings, the PD ordinance sets total FAR for the combined site — new building's available FAR = total PD allowable minus existing building's consumed gross floor area. Confirm existing building GSF via PD ordinance before calculating remaining capacity. Confirmed at: 741 N. Wells (PD 1519, residential — 755 N. Wells consumed 15,996 SF) and 609 W. Randolph (commercial — 601 W. Randolph consumed 13,843 SF).
+  - **EVSE**: if 25+ parking spaces (new construction), Illinois Vehicle Charging Act (IVCA, eff. 11/1/2020) triggers — 20% EV-ready + 20% EV-capable. Note in Non-Conformities if not planned. Chicago code matrix Z.17.
 - DC triggers: DCSHPO, HPRB, Green Area Ratio, IZ (Inclusionary Zoning)
 - Idaho/Ada County: ACHD access, ITD state highway, subdivision plat sequence
 

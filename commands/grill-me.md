@@ -28,6 +28,7 @@ Classify what the user is about to do:
 8. Who is the project owner/developer?
 9. What jurisdiction — city, county, state?
 10. Is this a feasibility study or a permit-package-ready analysis?
+11. Is the site within a Chicago Planned Development (PD) that includes other existing buildings? Multi-building PD sites bundle FAR — new building's available capacity = total PD allowable minus the existing building's consumed gross floor area. Confirm PD ordinance number and existing building GSF before calculating.
 
 **Building Code Research questions:**
 1. What is the proposed occupancy classification(s)?
@@ -39,6 +40,8 @@ Classify what the user is about to do:
 7. Is there a sprinkler system (NFPA 13 / 13R / 13D)?
 8. Are there accessible routes to be analyzed (ADA/FHA)?
 9. What is the specific code question — egress, occupant load, fire separation, accessibility?
+10. Is the building a high-rise (>80' AGL)? Chicago IBC 403 / CBC 403 triggers at 80 feet — separate checklist applies.
+11. Is this project within a Chicago Planned Development (PD)? PD minor change petition may be required before permit for any change of occupancy or program expansion.
 
 **RFI questions:**
 1. RFI number?

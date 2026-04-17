@@ -148,3 +148,55 @@ Output format: always zoning-template.md structure — tables for dimensional st
 
 ## Obsidian Vault
 - [[_global-context]] — persistent firm profile, Cowork project memory hub
+
+## Wiki Knowledge Base
+**Path:** `C:\Users\smatuzik\Documents\Claude\StaszekOS\claude-obsidian\wiki\`
+
+A persistent, compounding code compliance knowledge base built from real AA permitted projects. Read it before answering any code compliance, zoning, or building systems question.
+
+### When to use the wiki
+- Any IBC occupancy, egress, or construction type question
+- Any Chicago CBC (Title 14B/14M/14P/14E/14F/14N) question
+- Any ADA / accessibility question
+- Any fire separation, sprinkler, or NFPA question
+- Any tenant build-out or change-of-occupancy question
+
+### Read order (always follow this sequence)
+1. **`wiki/hot.md`** — read first, every time. ~500 words, recent context + domain summary
+2. **`wiki/index.md`** — if hot.md is not enough, scan the full index
+3. **`wiki/concepts/_index.md`** — drill into the relevant concept domain
+4. **`wiki/sources/_index.md`** — find the relevant project source page
+5. **Specific page** — read only the page(s) that match the question
+
+### Do NOT
+- Read the entire wiki speculatively
+- Read wiki pages for general coding questions unrelated to AEC / code compliance
+- Skip hot.md — it is the entry point
+
+### Current domains covered
+- IBC retail mixed occupancy (M+B+S) — Orr's Jewelers, Pittsburgh PA
+- Chicago A-2 restaurant tenant build-out — Gibsons Tavern, 925 W. Fulton
+- UL fire separation assembly library (U408, 465, 411, 415B, G586, C60)
+- ADA mezzanine accessibility exception (under 3,000 SF)
+- Chicago Planned Development + change of occupancy process
+- Restaurant floor assembly: LW concrete + XPS + radiant heating
+- Multi-family podium construction (Type V-A over Type I-A) — Middle Ei8ht, Franklin TN
+- IBC 510.2 horizontal building separation, A2L refrigerant shafts, V-A draftstopping
+- Chicago historic building renovation — CBRC 2018 + CBC dual-application, Landmarks CCL review, IBC 403 high-rise (80' threshold), existing fire escape egress — Driehaus Museum, 50 E. Erie
+- Chicago high-rise residential new construction — Type I-A + 403.2.1.1 sprinkler reduction, R-2/S-2 3-HR separation, TSL parking (DX-12), DU cooking suppression — DAC, 626 S. Wabash
+- Chicago ARO + MOPD accessibility — 20% affordable triggers all-Type-A affordable units, Type A/B split for market-rate, FHA Amendment 7, EV charging mandate — Vista, 370 N. Morgan (PD 1578)
+- Type III-B 5-story mid-rise (2018 IBC, suburban IL) — 0 HR structural, 1/2 HR partitions, fire wall area split, horizontal exit / elevator exception, NFPA 13, IAC 20% adaptable — Hines, 1200 E. Diehl, Naperville
+- Religious assembly interior design (NYCBC, ID-only scope) — millwork-heavy Beit Midrash renovation, Torah Ark, delegated stair, 42" tempered glass guardrail, Larsen's FEC, NYC vs. IBC context — EJSS, 2085 Ocean Pkwy, Brooklyn
+- Chicago Self-Cert permit process — eligibility, deferred submittals, A-2 0 HR corridor at <300 occ, process vs. standard plan review; institutional A-2 TI in Type I-A high-rise (family dining) — RMHC, 211 E Grand Ave
+- Type II-A institutional/athletic new construction — 1 HR frame/floors, 0 HR roof (>20' AFF), A-3+B 2 HR separation (footnote h, agg. occ. ≥300), IDPH pool/spa review, design architect + EOR split — DePaul Basketball Practice Facility, 2300 N. Sheffield
+- Mixed-use rental, Type I-A podium (SFRM steel) + Type III-B wood frame above, 2018 IBC (Pittsburgh PA, no ARO/MOPD/IAC), ground-floor residential in podium zone, amenity floor at L2, Pittsburgh bike parking (1/3 DU, 60% protected) — Brickworks Building A, 49 21st St
+- AIA practice management (8 Best Practices) — SD/DD phase checklists + deliverable standards, graphically-complete-typical-floor principle (Approach 3), CA qualifying language + stop-work prohibition, top 5 QC risks (constant since 1973), peer review program (SD/DD/75% CDs), sheet count discipline, record retention by project state law
+- Type III-B residential WRAP around Type I-A precast concrete garage (Northbrook IL) — wrap typology vs. podium, IBC 705.3 Exception 2 adjacent wall condition, 3 fire-wall sub-buildings area compliance, IAC 20% adaptable, no ARO/MOPD — Lennar/Quarterra, 1657 Shermer Rd
+- Fitness club interior TI (Chicago IL, 2018 IBC) — locker room renovation, tile-over-tile (TCNA TR712-09/713), millwork pattern (towel drop + counter + lavatory), D/B structural for wall openings, no MEP engineer scope — FFC Old Town, 1235 N. LaSalle
+- Chicago high-rise residential new construction (2019 CBC, West Loop) — Type I-A + 403.2.1.1 I-B reduction, IBC 403 full high-rise, DX-7 FAR 7.0, MOPD 20% Type A, unit finish + fixture specification pattern (Shaw LVT/Daltile quartz/Kohler Purist matte black/Quest thermafoil), partition assembly library (UL 465/411/415/U493) — 566 W. Van Buren, GC Lendlease
+- 2021 IBC high-rise residential (Greenville SC) — Type I-A + I-B reduction, smokeproof ALL stairways (403.5.4) vs. CBC conditional, R-2/S-2 1 HR (not 3 HR), 1/2 HR corridors, 2 fire service elevators, townhouse-in-high-rise pattern (1019.3 Ex. 2), 2% Type A only (no MOPD/IAC/ARO), C4 zoning (no FAR/height/setbacks), Greenville CBD Design Review Board — Academy Tower, 301 College St.
+- AA MasterFormat project manual for multi-family residential (2018 IBC, Type III-B, 5-story, Naperville IL) — ~110 sections Div 01-14; SFRM gypsum-based (Grace MK-6/Isolatek Cafco 300/Carboline 5GP); Hilti firestopping (CFS-TTS HoW basis); USG GWB schedule (GB-1B through GB-3C); TCNA tile methods (B412/B415/W244F); LVT 20 mil commercial / 8 mil residential; Caesarstone/Cambria quartz 2CM/3CM; AWI Custom millwork; Chemetal metal sheet; WiredScore — Hines 1200 E. Diehl, Naperville
+- Chicago DOB code compliance matrix (2019 CBC) — Z.01-Z.24 zoning items (mandatory for every permit), B.03-B.31 building code items (suggested format for G0-03/G0-04 sheets), supplemental submissions (MOPD form, structural, stormwater); EVSE eff. 11/1/2020 (Z.17); B.07 fire resistance 21-item subsection; Chicago-only items (City Fire Alarm Box B.09.15, solar reflectance B.15.05, ARO Z.23)
+- Chicago commercial office high-rise (2019 CBC, SD 2023) — B/M/S-2 occupancy, Type I-A + 403.2.1.1 I-B reduction, IBC 403 full scope, 406.2.8 parking garage 3-HR separation (governs over Table 508.4), DX-7 + 4.5 bonus FAR via Planned Development, 0 HR corridors (commercial vs. 1 HR residential), no ARO/MOPD/FHA — 644 W. Randolph (Vista 640)
+- Medical office outpatient new construction (2015 IBC, suburban IL) — Group B (not I-2), Type I-B → II-A double reduction per 403.2.1.1, IBC 403 high-rise at 99'-0" but NO fire service elevator (403.6.1 threshold = 120'), shafts NOT sprinkled (2 HR CMU maintained), ORA-2 PUD zoning, Green Globes certification — MOOB, Oak Brook IL
+- Chicago high-rise residential new construction (2019 CBC, South Loop) — Type 1A, DX-16 FAR 10.7 (no PD), 25 stories / 260'-10", 344 DU, Class A2/H3/C2/F occupancies, diesel generator NOT required (CBC 4(13-76-080)(b) threshold = 400 FT), BA resilient-channel partition (STC 55/1 HR), Z40 3 HR fully grouted CMU at garage separation, Cosentini MEP — LMC 410 S Wabash

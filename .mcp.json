@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "staszekos-wiki": {
+      "command": "python",
+      "args": ["C:\\Users\\smatuzik\\Documents\\Claude\\StaszekOS\\Scheduled\\wiki-mcp.py"],
+      "description": "StaszekOS wiki — AA permitted project knowledge base. Tools: wiki_hot, wiki_index, wiki_sources, wiki_concepts, wiki_read, wiki_search, wiki_list_pages"
+    }
+  }
+}

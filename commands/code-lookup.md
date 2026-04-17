@@ -16,7 +16,7 @@ Collect via /grill-me if not provided:
 ### 1. Jurisdiction Code Adoption
 - Search: `[city/state] adopted building code [year] amendments`
 - Confirm: IBC edition year, local amendments, fire code adoption
-- Chicago-specific: Chicago Building Code (CBC) amendments to IBC 2021
+- Chicago-specific: Chicago Building Code (CBC) 2019 — based on IBC 2018 with Chicago amendments (Title 14B/14M/14E/14F/14N/14P). NOT IBC 2021. Use 2019 CBC tables, not IBC 2021, for all Chicago permit work.
 - Record: AHJ contact if permit-package work
 
 ### 2. Occupancy Classification
@@ -30,6 +30,7 @@ Collect via /grill-me if not provided:
 - Apply sprinkler increase (§504.2, §506.3) if NFPA 13 system present
 - Apply frontage increase (§506.2) if applicable
 - Search: `IBC 2021 Table 504 [occupancy] [construction type]`
+- Chicago high-rise flag (>80' AGL = CBC 18-27-4-403 / IBC 403): IBC 403.2.1.1 allows construction type reduction to I-B with NFPA 13 throughout; primary frame + columns = 3 HR (not reduced); bearing walls = 2 HR; shaft enclosures = 1 HR (exit enclosures + hoistways excluded from reduction); R-2/S-2 separation = 3 HR (CBC governs — NOT IBC 1 HR); R-2 corridors = 1 HR for >10 occupants per Title 14B; commercial B/M corridors = 0 HR; (1) fire service elevator required at 3,500 lbs min capacity (NOT 2 — that is IBC 2021/non-Chicago); stairway doors lockable from within stair, unlockable at FCC per CBC 403.5.3 (smokeproof vestibules on ALL stairways are IBC 2021 non-Chicago behavior — do NOT apply to CBC projects); fire command center: location per §911, acceptable to fire code official (no SF minimum in CBC — ≥200 SF/1 HR is IBC 2021 only); System 2 emergency power required for all Chicago high-rises >80 FT (CBC 4(13-76-080)); diesel generator NOT required below 400 FT (confirmed: all AA Chicago projects are below 400 FT); garage separation per CBC 13-56-280: R-2/S-2 = 3 HR base − 1 HR sprinkler reduction = 3 HR min; M/S-2 = 3 HR base − 1 HR = 2 HR (IBC 406.2.8 is flat 3 HR with NO sprinkler reduction — Chicago is more permissive)
 
 ### 4. Egress
 - Occupant load: IBC Table 1004.5
@@ -44,6 +45,7 @@ Collect via /grill-me if not provided:
 - Fire barrier / fire partition requirements: IBC §707, §708
 - Shaft enclosures: IBC §713
 - Search: `IBC 2021 fire separation [occupancy A] [occupancy B]`
+- AA partition type library (from permitted projects — Chicago high-rise + TI): Type A = UL 465, 1 HR, STC 40–49 (standard metal stud); Type BA = UL U452 resilient channel, 1 HR, STC 55 (sound-critical demising; first confirmed at LMC 410 S. Wabash); Type C = UL 411, 2 HR, STC 48–56; Type G = UL 420, 2 HR, STC 58; Type K = UL 415B, 2 HR shaft wall; Type Z30 = UL U905, 2 HR CMU; Type Z40 = UL U907, 3 HR grouted CMU (used at R-2/S-2 separation in LMC 410); floor-ceiling = UL G586, 2 HR; column wrap = UL C60, 2 HR. Head-of-wall: UL 2079 tested assembly required (Hilti CFS-TTS basis, ±50% movement).
 
 ### 6. Sprinkler System (NFPA 13/13R/13D)
 - Required by IBC §903 for the occupancy/height/area — confirm
@@ -56,7 +58,9 @@ Collect via /grill-me if not provided:
 - Accessible parking: IBC Table 1106.1
 - Toilet room requirements: IBC §1109
 - Type A / Type B dwelling unit ratio: IBC §1107 (if residential)
-- FHA applicability: buildings with 4+ dwelling units, elevator served
+- FHA applicability: buildings with 4+ dwelling units, elevator served → IBC 1107 Type B units (all) + FHA Amendment 7 (100% Type B with mobility/hearing features). Note: IBC 1107.7 ≥ FHA minimum but confirm applicability.
+- Chicago MOPD layer (residential, 10+ units): ARO at 20% affordable → ALL affordable units become Type A; market-rate split is Type A/B per MOPD matrix. MOPD Project Data Form (code matrix B.11.01) required for all Chicago projects regardless of residential/commercial.
+- EV charging: Illinois Vehicle Charging Act (IVCA) — new construction with 25+ parking spaces → 20% EV-ready + 20% EV-capable stalls (effective 11/1/2020). Chicago code matrix Z.17.
 - Search: `IBC 2021 accessibility [element] [occupancy]`
 
 ### 8. Fire Alarm (NFPA 72)
@@ -69,6 +73,13 @@ Collect via /grill-me if not provided:
 - IECC adoption by jurisdiction
 - Chicago: Chicago Energy Conservation Code
 - Search: `[jurisdiction] energy code [year] adopted`
+
+### 10. Chicago Permit Code Matrix (Chicago permit-package work only)
+- Z.01-Z.24 zoning items: MANDATORY on all plans-required permits (goes on G0-03/G0-04 sheets)
+- B.03-B.31 building code items: SUGGESTED FORMAT — omit inapplicable rows or use alternate format
+- Key sections: B.07 fire resistance (21 sub-items — walls, floors, shafts, openings, penetrations); B.09.15 City Fire Alarm Box (Chicago-only, no IBC equivalent); B.11.01 MOPD Project Data Form (required ALL projects, not just residential); B.15.05 solar reflectance (Chicago Green Building Ordinance)
+- Self-Cert permits: use same matrix format; zoning reviewed separately by Zoning Administrator
+- Reference: City of Chicago DOB Sample Code Compliance Matrix, revised 7/29/2020
 
 ## Output Format
 
