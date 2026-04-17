@@ -145,15 +145,120 @@ try {
     Write-Host "  ✗ Git not found. Install from https://git-scm.com/" -ForegroundColor Red
 }
 
+# ─── 9. Install wiki MCP scripts to Scheduled/ ──────────────────────────────
+Write-Host "`n9. Installing wiki MCP and sync scripts..." -ForegroundColor Yellow
+
+$scheduledDst = "$WorkspaceRoot\Scheduled"
+New-Item -ItemType Directory -Force -Path $scheduledDst | Out-Null
+
+$scripts = @("wiki-mcp.py", "wiki-mcp-http.py", "sync-cowork.py")
+foreach ($s in $scripts) {
+    $src = "$PluginRoot\scripts\$s"
+    if (Test-Path $src) {
+        Copy-Item $src -Destination "$scheduledDst\$s" -Force
+        Write-Host "  ✓ $s -> Scheduled/" -ForegroundColor Green
+    } else {
+        Write-Host "  ✗ $s not found in plugin/scripts/" -ForegroundColor Red
+    }
+}
+
+# ─── 10. Install settings.json (Stop hook) ──────────────────────────────────
+Write-Host "`n10. Installing settings.json (Stop hook)..." -ForegroundColor Yellow
+
+$settingsJsonSrc = "$PluginRoot\config\settings.json"
+$settingsJsonDst = "$WorkspaceRoot\.claude\settings.json"
+
+if (Test-Path $settingsJsonSrc) {
+    if (-not (Test-Path $settingsJsonDst)) {
+        Copy-Item $settingsJsonSrc -Destination $settingsJsonDst -Force
+        Write-Host "  ✓ settings.json installed (Stop hook: sync-cowork.py runs on session end)" -ForegroundColor Green
+    } else {
+        Write-Host "  ✓ settings.json already exists (not overwritten — merge manually if needed)" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "  ✗ config/settings.json not found in plugin" -ForegroundColor Red
+}
+
+# ─── 11. Install .mcp.json (wiki MCP for Claude Code) ───────────────────────
+Write-Host "`n11. Installing .mcp.json (wiki MCP server)..." -ForegroundColor Yellow
+
+$mcpSrc = "$PluginRoot\config\staszekos-mcp.json"
+$mcpDst = "$WorkspaceRoot\.mcp.json"
+
+if (Test-Path $mcpSrc) {
+    if (-not (Test-Path $mcpDst)) {
+        Copy-Item $mcpSrc -Destination $mcpDst -Force
+        Write-Host "  ✓ .mcp.json installed (wiki tools available in Claude Code after restart)" -ForegroundColor Green
+    } else {
+        Write-Host "  ✓ .mcp.json already exists (not overwritten)" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "  ✗ config/staszekos-mcp.json not found in plugin" -ForegroundColor Red
+}
+
+# ─── 12. Install Cowork project CLAUDE.md files ─────────────────────────────
+Write-Host "`n12. Installing Cowork project context files..." -ForegroundColor Yellow
+
+$coworkProjectsRoot = "$env:USERPROFILE\Documents\Claude\Projects"
+
+$coworkMap = @{
+    "Cowork\Code-Research\CLAUDE_2.md"           = "$coworkProjectsRoot\CODE\CLAUDE_2.md"
+    "Cowork\Code-Research\ZONING.md"             = "$coworkProjectsRoot\CODE\ZONING.md"
+    "Cowork\Zoning-Analysis\CLAUDE.md"           = "$coworkProjectsRoot\ZONING\CLAUDE.md"
+    "Cowork\RFI-Drafting\CLAUDE.md"              = "$coworkProjectsRoot\RFI drafting\CLAUDE.md"
+    "Cowork\SPEC-Writing\CLAUDE.md"              = "$coworkProjectsRoot\SPEC writing\CLAUDE.md"
+    "Cowork\SHPO-Narrative\CLAUDE.md"            = "$coworkProjectsRoot\SHPO Treatment Narrative\CLAUDE.md"
+    "Cowork\hot.md"                              = "$coworkProjectsRoot\CODE\hot.md"
+    "Cowork\hot.md"                              = "$coworkProjectsRoot\ZONING\hot.md"
+    "Cowork\hot.md"                              = "$coworkProjectsRoot\RFI drafting\hot.md"
+    "Cowork\hot.md"                              = "$coworkProjectsRoot\SPEC writing\hot.md"
+    "Cowork\hot.md"                              = "$coworkProjectsRoot\SHPO Treatment Narrative\hot.md"
+}
+
+foreach ($rel in $coworkMap.Keys) {
+    $src = "$PluginRoot\$rel"
+    $dst = $coworkMap[$rel]
+    $dstDir = Split-Path $dst -Parent
+    if (Test-Path $src) {
+        New-Item -ItemType Directory -Force -Path $dstDir | Out-Null
+        Copy-Item $src -Destination $dst -Force
+        Write-Host "  ✓ $(Split-Path $dst -Leaf) -> $(Split-Path $dstDir -Leaf)/" -ForegroundColor Green
+    } else {
+        Write-Host "  ✗ Source not found: $src" -ForegroundColor Red
+    }
+}
+
+# ─── 13. Install Python dependencies for wiki MCP ───────────────────────────
+Write-Host "`n13. Installing Python dependencies..." -ForegroundColor Yellow
+
+$pipPkgs = @("mcp", "starlette", "uvicorn", "anthropic")
+foreach ($pkg in $pipPkgs) {
+    Write-Host "  Installing $pkg..." -ForegroundColor Gray
+    python -m pip install $pkg --break-system-packages --quiet 2>&1 | Out-Null
+    Write-Host "  ✓ $pkg" -ForegroundColor Green
+}
+
 # ─── Summary ─────────────────────────────────────────────────────────────────
 Write-Host "`n=== Bootstrap Complete ===" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Next steps:" -ForegroundColor White
-Write-Host "  1. Add your GitHub token to: $settingsPath" -ForegroundColor White
-Write-Host "  2. Place the FortiGate CA cert at: $certPath" -ForegroundColor White
-Write-Host "  3. Open Obsidian → open vault at $WorkspaceRoot" -ForegroundColor White
-Write-Host "  4. Install Obsidian plugin: Local REST API (community plugins)" -ForegroundColor White
-Write-Host "  5. In Claude Code, run: /setup" -ForegroundColor White
-Write-Host "  6. Re-authenticate MCP servers in claude.ai settings (Drive, M365)" -ForegroundColor White
+Write-Host "What was installed:" -ForegroundColor White
+Write-Host "  ✓ Slash commands  -> .claude/commands/" -ForegroundColor Green
+Write-Host "  ✓ Cowork vault    -> Cowork/ (Obsidian)" -ForegroundColor Green
+Write-Host "  ✓ Cowork contexts -> Documents/Claude/Projects/ (claude.ai)" -ForegroundColor Green
+Write-Host "  ✓ Wiki MCP server -> Scheduled/wiki-mcp.py" -ForegroundColor Green
+Write-Host "  ✓ Sync pipeline   -> Scheduled/sync-cowork.py" -ForegroundColor Green
+Write-Host "  ✓ Stop hook       -> .claude/settings.json" -ForegroundColor Green
+Write-Host "  ✓ MCP registration-> .mcp.json" -ForegroundColor Green
+Write-Host "  ✓ Knowledge base  -> hot.md in all Cowork projects" -ForegroundColor Green
+Write-Host ""
+Write-Host "Required manual steps:" -ForegroundColor Yellow
+Write-Host "  1. Add GitHub token to: $settingsPath" -ForegroundColor White
+Write-Host "  2. Place FortiGate CA cert at: $certPath" -ForegroundColor White
+Write-Host "  3. Clone wiki repo:  git clone https://github.com/trickstero/claude-obsidian.git" -ForegroundColor White
+Write-Host "     into: $WorkspaceRoot\claude-obsidian" -ForegroundColor White
+Write-Host "  4. Open Obsidian -> open vault at $WorkspaceRoot" -ForegroundColor White
+Write-Host "  5. Install Obsidian plugin: Local REST API (community plugins)" -ForegroundColor White
+Write-Host "  6. Restart Claude Code -> wiki tools appear automatically" -ForegroundColor White
+Write-Host "  7. In claude.ai Cowork projects -> verify CLAUDE_2.md and CLAUDE.md loaded" -ForegroundColor White
 Write-Host ""
 Write-Host "For full setup guide see: $PluginRoot\README.md" -ForegroundColor Cyan

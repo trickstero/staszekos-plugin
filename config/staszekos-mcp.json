@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "staszekos-wiki": {
+      "command": "python",
+      "args": ["C:\\Users\\smatuzik\\Documents\\Claude\\StaszekOS\\Scheduled\\wiki-mcp.py"]
+    }
+  }
+}

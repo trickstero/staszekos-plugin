@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"C:\\Users\\smatuzik\\Documents\\Claude\\StaszekOS\\Scheduled\\sync-cowork.py\" --silent"
+          }
+        ]
+      }
+    ]
+  }
+}
