@@ -1,5 +1,7 @@
 # StaszekOS — Claude Code Workspace
 
+**Persistent memory:** `memory/MEMORY.md` (user profile, feedback, projects, references — auto-loaded in main context)
+
 ## Who You're Working With
 **Staszek Matuzik** — Senior Associate at Antunovich Associates (244 W. Huron St., Chicago).
 Firm AI lead across all nine practice areas.
@@ -35,7 +37,7 @@ StaszekOS/
 
 ### Antunovich AI (firm tooling)
 GitHub: trickstero/antunovich-ai | Live: https://trickstero.github.io/antunovich-ai
-Slash commands: /rfi /spec /shpo /render /review /bootstrap
+Slash commands: /rfi /spec /shpo /render /render-interior /review /bootstrap
 MCP: Filesystem, Gmail, Google Calendar, Google Drive, Microsoft 365
 
 ### Zoning Analysis (Cowork project)
@@ -46,6 +48,16 @@ Web search every analysis — never rely on memory for code language.
 ### Code Research (Cowork project)
 Building code compliance: IBC occupancy/construction type, ADA, NFPA 13/72, jurisdiction-specific overlays.
 Feeds directly into zoning memos and permit packages.
+
+### StaszekOS Plugin (distribution)
+GitHub: trickstero/staszekos-plugin — ships CLAUDE.md, memory, Cowork contexts, slash commands.
+Bootstrap: `scripts/bootstrap.ps1` provisions new machines.
+
+### Claude-Obsidia Wiki (knowledge ingest)
+GitHub: trickstero/claude-obsidia — Obsidian vault ingest output feeding `claude-obsidian/wiki/`.
+
+### Cowork Coordinator (quality eval)
+Runs live eval loop on Cowork sessions (not synced to StaszekOS). Hard Rules 13 (code edition verify) + 14 (FLAGS self-test) apply to all code analysis. Details: `memory/project_cowork_coordinator_eval.md`.
 
 ## Slash Commands Available
 | Command | Purpose |
@@ -106,7 +118,6 @@ When a Cowork project is mentioned or `/sync-cowork` is run, ALWAYS present the 
 - Token type: classic (ghp_...) — stored in settings.local.json
 - Default repo: antunovich-ai
 - Note: api.github.com DNS-blocked from bash — git push to github.com works fine
-- Pages: enable manually via repo Settings → Pages → main → Save
 
 ## Corporate Network
 - SSL inspection: FortiGate (FG100FTK22020870) — CA cert at C:\Users\smatuzik\Documents\Claude\antunovich-ca.pem
@@ -114,9 +125,7 @@ When a Cowork project is mentioned or `/sync-cowork` is run, ALWAYS present the 
 - IT whitelist ticket: domains approved, SSL inspection mode change pending (Michael Thompson, Applied Tech)
 
 ## MCP Servers
-Connected via claude.ai (auto-sync to Claude Code):
-- ✅ Gmail, Google Calendar, Excalidraw, Figma, Wix, Aiwyn Tax
-- ⚠ Google Drive, Microsoft 365, Cloudinary, Guru (need auth in claude.ai settings)
+Available via claude.ai auto-sync. Current connection + auth status tracked in `memory/reference_mcp_servers.md`.
 
 ## Key Rules
 1. Respond bottom-line first — no preamble
@@ -125,26 +134,6 @@ Connected via claude.ai (auto-sync to Claude Code):
 4. Secrets never go in committed files — always settings.local.json
 5. For PowerShell: write every click, every paste, every command
 6. Python scripts: always use `--break-system-packages` for pip, SSL workaround via `ssl._create_default_https_context = ssl._create_unverified_context`
-
-## Related Cowork Projects (claude.ai)
-- SHPO Narrative — historic preservation narratives
-- SPEC Writing — MasterFormat specification sections
-- RFI Drafting — request for information documents
-- Zoning Analysis — code research + zoning feasibility (all 50 states + DC)
-- Code Research — building code, IBC, jurisdiction-specific overlays
-
-## Zoning & Code Research Context
-Web search every analysis — never use memory for code language.
-Research sequence: zoning GIS map → Municode/official code → overlays → FEMA flood → variance precedent → IBC check.
-
-**Jurisdiction triggers to remember:**
-- Chicago: ARO (10+ units), TSL (transit-served locations), Pedestrian Streets, Lakefront Overlay
-- Illinois non-Chicago: IDOT access permit if state route frontage, IHPA for SHPO
-- Idaho (Kingswood/Brekenwood): ACHD access (Ada County), ITD (state highway), subdivision plat sequence
-- DC: DCSHPO + HPRB, Green Area Ratio, Inclusionary Zoning
-- National: IBC occupancy/construction type matrix, ADA, NFPA 13/72
-
-Output format: always zoning-template.md structure — tables for dimensional standards, code citation on every standard, every non-conformity labeled with relief type. Design-supplement.md after memo: massing calc, entitlement risk matrix, IBC flags, HTC flag if historic overlay.
 
 ## Obsidian Vault
 - [[_global-context]] — persistent firm profile, Cowork project memory hub
